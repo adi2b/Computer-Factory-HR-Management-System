@@ -1,0 +1,92 @@
+<html>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+    <style>
+      body{
+                background-image: url("CompFactory_Background.jpg");
+                background-repeat: repeat;
+                background-attachment: fixed;
+            }
+            h1{text-align: center;}
+            h2{text-align: center;}
+            h4{text-align: left;}
+  
+  </style>
+
+    <script>
+
+            function CurrentUser()
+            {
+                document.getElementById("userIdentity").innerText = localStorage.getItem("user name header");
+            }
+
+            async function addShift()
+            {
+
+              let shift = {
+                          "Date": document.getElementById("shiftDate").value,
+                          "Starts": document.getElementById("shiftStart").value,
+                          "Ends": document.getElementById("shiftEnd").value,
+                      } 
+
+              let fetchParams = {method : 'POST',
+                                body : JSON.stringify(shift),
+                                headers : {"Content-Type" : "application/json"}
+                                }
+
+              let resp = await fetch("https://localhost:44383/api/Shift", fetchParams);
+              let status = await resp.json();
+
+              alert(status)
+
+              window.location.href = "shifts.html";
+            }
+
+    </script>
+
+    <body  onload="CurrentUser()">
+        <br><br>
+        <h1 style="background-color: azure;">CompFactory Management System</h1> <br>
+
+      
+        <div>
+            <h4 style="color: aqua;">Current User:</h4>
+            <h4 style="color: aqua;" id="userIdentity"></h4>
+        </div>
+
+        <h2 style="color:antiquewhite">Additional Shifts</h2> <br>
+        <h5 style="color: antiquewhite;">Add shifts to CompFactory table of shifts:</h5> <br>
+     
+        <div class="form-group">
+          <label style="color:antiquewhite;" for="shiftDate">Date:</label>
+          <input type="date" min="01-01-2020" class="form-control" id="shiftDate" style="width: 200px">
+        </div>
+        <br/>
+  
+        <div class="form-group">
+          <label style="color:antiquewhite;" for="shiftStart">Shift starts at:</label> <br>
+          <select style="width: 200px;" class="form-control" id="shiftStart">
+            <option>Choose an Hour</option>
+            <option value="1">1 pm</option>
+            <option value="4">4 pm</option>
+            <option value="7">7 pm</option>
+          </select>
+        </div> <br>
+        
+        <div class="form-group">
+          <label style="color:antiquewhite;" for="shiftEnd">Shift ends at:</label> <br>
+          <select style="width: 200px;" class="form-control" id="shiftEnd">
+            <option>Choose an Hour</option>
+            <option value="4">4 pm</option>
+            <option value="7">7 pm</option>
+            <option value="10">10 pm</option>
+          </select>
+        </div> <br><br>
+
+        <button class="btn btn-primary" onclick="addShift()">Add New Shift</button>
+  
+         <br><br>
+         <a style="color: azure;" href="homePage.html">Return to Home Page</a>
+
+    </body>
+</html>

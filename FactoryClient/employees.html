@@ -1,0 +1,202 @@
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+        <style>
+            body{
+                background-image: url("CompFactory_Background.jpg");
+                background-repeat: repeat;
+                background-attachment: fixed;
+            }
+            h1{text-align: center;}
+            h2{text-align: center;}
+
+            table{text-align: center; background-color: aqua;}
+
+            .button {
+        border: none;
+        width: 20%;
+        color: white;
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 30px;
+        margin: 20px 20px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+        }
+
+        .button1 {
+        background-color: white; 
+        color: black; 
+        border: 4px solid #4CAF50;
+        }
+
+        .button1:hover {
+        background-color: #4CAF50;
+        color: white;
+        }
+        </style>
+    </head>
+
+    <script>
+        empid ="";                               
+
+        async function createEmployeeTable(employees)
+        {
+          let tblObj = document.getElementById("tBody");
+          tblObj.innerText = "";
+
+          employees.forEach(empl => {
+
+            empid = empl.ID;                       
+
+            let tdFirstName = document.createElement("td");
+            let tdLastName = document.createElement("td");
+            let tdStartYear = document.createElement("td");
+            let tdDepartment = document.createElement("td");
+            let tdShifts = document.createElement("td");
+            let tdModifyLink = document.createElement("td");
+//start shiftID            
+            let ulObj = document.createElement("ul");
+
+            empl.Shifts.forEach(shift =>
+            {
+              let liObj = document.createElement("li");
+              liObj.innerText = shift;
+              ulObj.appendChild(liObj);
+
+            })
+
+            tdShifts.appendChild(ulObj);
+
+
+            let editLinkObj = document.createElement("a");
+            let deleteLinkObj = document.createElement("a");
+            let addShiftLinkObj = document.createElement("a");
+
+            tdFirstName.innerText = empl.First_Name;
+            tdLastName.innerText = empl.Last_Name;
+            tdStartYear.innerText = empl.Start_Year;
+            tdDepartment.innerText = empl.Department;
+
+            editLinkObj.innerText = "Edit ; ";
+            editLinkObj.href = "employeeEdit.html?EmployeeID="+empid;    
+            tdModifyLink.appendChild(editLinkObj);
+
+// Delete Link - part 1 of 2 -----------------------------------------
+            deleteLinkObj.innerText = " Delete ; ";
+
+            deleteLinkObj.addEventListener('click', function() {
+                deleteEmployee(empid);                
+                });
+
+            deleteLinkObj.href = "employees.html";             
+            tdModifyLink.appendChild(deleteLinkObj);
+
+
+            addShiftLinkObj.innerText = " Add Shift";
+            addShiftLinkObj.href = "employeeAddShift.html?EmployeeID="+empid;   
+            tdModifyLink.appendChild(addShiftLinkObj);
+
+            let trObj = document.createElement("tr");
+            trObj.appendChild(tdFirstName);
+            trObj.appendChild(tdLastName);
+            trObj.appendChild(tdStartYear);
+            trObj.appendChild(tdDepartment);
+            trObj.appendChild(tdShifts);
+            trObj.appendChild(tdModifyLink);
+
+            tblObj.appendChild(trObj);                                
+          });
+        }
+
+// Delete Link - part 2 of 2 -------------
+        async function deleteEmployee(emp) {  
+
+
+
+        let fetchParams = {method: 'DELETE',
+                            headers: {"Content-Type" : "application/json"} 
+        }
+        let respEmp = await fetch("https://localhost:44383/api/Employee/"+empid, fetchParams);
+        let status = await respEmp.json();
+
+        alert(status);
+
+        window.location.href = "employees.html";
+}
+
+
+
+        async function getEmployees()
+            {
+              document.getElementById("userIdentity").innerText = localStorage.getItem("user name header");
+
+
+                let resp = await fetch("https://localhost:44383/api/Employee");
+                let employees = await resp.json();
+
+                let respShift = await fetch("https://localhost:44383/api/Shift");  
+                let shifts = await respShift.json();                               
+
+                createEmployeeTable(employees)
+            }
+
+            function createEmployee()
+            {
+              window.location.href = "employeeAdd.html"
+            }
+
+
+        function saveSeachedText(txt)
+            {
+              let searchText = document.getElementById("searchName").value;
+              sessionStorage["searchText"] = searchText;
+              window.location.href = "employeeSearch.html";
+            }
+
+
+    </script>
+
+        <br>
+        <h1 style="background-color: azure;">CompFactory Management System</h1> <br>
+        <h2 style="color:antiquewhite">CompFactory - List of Employees</h2> 
+
+    <body  onload="getEmployees()">
+      <div>
+       
+          <h4 style="color: aqua;">Current User:</h4>
+          <h4 style="color: aqua;" id="userIdentity"></h4> 
+        </div> <br>
+        <h5 style="color: antiquewhite;">List ot all CompFactory's employees:</h5> <br>
+
+        <button class="btn btn-primary" onclick="createEmployee()">Add New Employees</button> <br/> <br/>
+        <div>
+            <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Year Started Working</th>
+                    <th scope="col">Department</th>
+                    <th scope="col">Shifts</th>
+                    <th scope="col">Optional Modifications</th>
+                  </tr>
+                </thead>
+                <tbody id="tBody">
+          
+                </tbody>
+              </table>
+        </div>
+        <br>
+        <h5 style="color: antiquewhite;">Search Employee/s by first name, last name, or department :</h5>
+          <input type="text" id="searchName">
+         <button class="btn btn-info"  onclick="saveSeachedText()">Search !</button> <br/> <br/>
+
+        
+         <a style="color: azure;" href="homePage.html">Return to Home Page</a>
+     
+    </body>
+</html>

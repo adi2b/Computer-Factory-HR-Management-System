@@ -1,0 +1,130 @@
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+        <style>
+            body{
+                background-image: url("CompFactory_Background.jpg");
+                background-repeat: repeat;
+                background-attachment: fixed;
+            }
+            h1{text-align: center;}
+            h2{text-align: center;}
+
+            form{ 
+                width: 30%;
+                text-align: left;
+            }
+
+            .button {
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+            .button1 {background-color: #4CAF50;} 
+
+        </style>
+    </head>
+
+    <script>
+
+        let DepartmentID;
+        let EmployeeID;         
+
+
+        async function getText()
+        {
+            document.getElementById("userIdentity").innerText = localStorage.getItem("user name header");
+
+            const params = new URLSearchParams(location.search);
+            DepartmentID = params.get("DepartmentID");
+
+
+            let resp = await fetch("https://localhost:44383/api/Department/" + DepartmentID);
+            let department = await resp.json();
+
+            document.getElementById("DepartmentName").value = department.Name;
+
+            let respEmp = await fetch("https://localhost:44383/api/Employee");
+            let employees = await respEmp.json();
+
+            employees.forEach(emp =>
+            {
+            let optionObj = document.createElement("option");
+            managerFullName = emp.First_Name + " " + emp.Last_Name;
+            optionObj.innerText = managerFullName;
+            optionObj.value = emp.ID;
+            let obj = document.getElementById("manager");
+            obj.appendChild(optionObj);
+    })
+
+        }
+
+        async function UpdateDepartment()
+        {
+            let dept = {"ID": DepartmentID,
+                        "Name" : document.getElementById("DepartmentName").value,
+                        "ManagerID" :+(document.getElementById("manager").value),
+                }
+
+            let fetchParams = {method : 'PUT',
+                                body : JSON.stringify(dept),
+                                headers : {"Content-Type" : "application/json"}
+                                }
+
+            let resp = await fetch("https://localhost:44383/api/Department/" + DepartmentID, fetchParams);
+            let status = await resp.json();
+
+            alert(status)
+                    
+            window.location.href = "departments.html";
+        }
+
+    </script>
+
+
+    <body onload="getText()">
+    <br>
+    <h1 style="background-color: azure;">CompFactory Management System</h1> <br><br>
+    <h2 style="color:antiquewhite">Editing Department Information</h2> <br>
+
+    <div>
+        
+          <h4 style="color: aqua;">Current User:</h4>
+          <h4 style="color: aqua;" id="userIdentity"></h4> 
+        </div> <br>
+
+    <h5 style="color: antiquewhite;">Please fill all following information in order to edit information of a department.</h5> <br><br>
+
+<center>
+
+    <form action="">
+        <div class="form-group">
+            <label style="color: antiquewhite;" for="DepartmentName">Edit Department' Name:</label> <br>
+        
+            <input type="text" class="form-control" id="DepartmentName">
+          </div> <br>
+
+          <div class="form-group">
+            <label style="color:antiquewhite;" for="manager">Select Department's Manager:</label> <br><br>
+            <select style="width: 250px;" onload="getEmployeeNames()" class="form-control" id="manager">
+              <option>Click Here For Options</option>
+            </select>
+          </div> <br>
+
+    </form> <br> 
+
+    <button onclick="UpdateDepartment()" class="button button1">Save Changes</button>
+</center> <br>
+<a style="color: azure;" href="homePage.html">Return to Home Page</a>
+
+</body>
+
+
+</html>

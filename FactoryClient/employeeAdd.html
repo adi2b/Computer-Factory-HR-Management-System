@@ -1,0 +1,102 @@
+<html>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+  <style>
+    body{
+              background-image: url("CompFactory_Background.jpg");
+              background-repeat: repeat;
+              background-attachment: fixed;
+          }
+          h1{text-align: center;}
+          h2{text-align: center;}
+          h4{text-align: left;}
+
+</style>
+<script>
+
+  let departmentID;
+
+async function getDepartmentText()
+{
+    document.getElementById("userIdentity").innerText = localStorage.getItem("user name header");
+
+    let respDept = await fetch("https://localhost:44383/api/Department");
+    let departments = await respDept.json();
+
+        departments.forEach(dept =>
+        {
+          let optionObj = document.createElement("option");
+          departmentID = dept.ID;
+          optionObj.innerText = dept.Name;
+          optionObj.value = dept.ID; 
+          let obj = document.getElementById("sel");
+          obj.appendChild(optionObj);
+        })
+}
+
+async function AddEmployee()
+{
+
+  let emp = {
+            "First_Name" : document.getElementById("firstName").value,
+            "Last_Name" : document.getElementById("lastName").value,
+            "Start_Year" : document.getElementById("startYear").value,
+            "DepartmentID" : +(document.getElementById("sel").value),             
+          } 
+
+  let fetchParams = {method : 'POST',
+                     body : JSON.stringify(emp),
+                     headers : {"Content-Type" : "application/json"}
+                     }
+
+  let resp = await fetch("https://localhost:44383/api/Employee", fetchParams);
+  let status = await resp.json();
+
+  alert(status)
+
+  window.location.href = "employees.html";
+}
+
+</script>
+    <br><br>
+  <body onload="getDepartmentText()">
+
+    <h1 style="background-color: azure;">CompFactory Management System</h1> <br>
+    <div>
+      
+        <h4 style="color: aqua;">Current User:</h4>
+        <h4 style="color: aqua;" id="userIdentity"></h4> 
+      </div> 
+    <h2 style="color:antiquewhite">*Bonus Page!!! New Employees</h2> <br>
+
+    <h5 style="color: rgb(11, 212, 55);">Please insert below required information of CompFactory new employees:</h5> <br>
+<center>
+      <div class="form-group">
+        <label style="color:antiquewhite;" for="firstName">Employee's First Name:</label>
+        <input type="text" class="form-control" id="firstName" style="width: 200px">
+      </div>  <br/>
+
+      <div class="form-group">
+        <label style="color:antiquewhite;" for="lastName">Employee's Last Name:</label>
+        <input type="text" class="form-control" id="lastName" style="width: 200px">
+      </div>  <br/>
+
+      <div class="form-group">
+        <label style="color:antiquewhite;" for="startYear">Starting year:</label>
+        <input type="number" min="2020" class="form-control" id="startYear" style="width: 200px">
+      </div>
+      <br/>
+
+      <div class="form-group">
+        <label style="color:antiquewhite;" for="department">Employee's Department:</label> <br>
+        <select style="width: 200px;" onload="getDepartmentText()" class="form-control" id="sel">
+          <option>Select Department</option>
+        </select>
+      </div> <br><br>
+
+      <button class="btn btn-primary" onclick="AddEmployee()">Add New Employee</button> <br><br>
+    </center>
+      <a style="color: azure;" href="homePage.html">Return to Home Page</a>
+  </body>
+
+</html>

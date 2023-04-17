@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+        <style>
+            body{
+                background-image: url("CompFactory_Background.jpg");
+                background-repeat: repeat;
+                background-attachment: fixed;
+            }
+            h1{text-align: center;}
+            h2{text-align: center;}
+
+            table{text-align: center; background-color: aqua;}
+        </style>
+    </head>
+
+    <script>
+
+function addShifts()
+        {
+            window.location.href = "shiftsAdd.html";
+        }
+
+async function createShiftsTable(shifts)
+{
+
+  let tblObj = document.getElementById("tBody")
+
+  let EmployeeID;
+
+  tblObj.innerText = "";
+
+  shifts.forEach(shft => {
+
+    let tdDate = document.createElement("td");
+    let tdStarts = document.createElement("td");
+    let tdEnds = document.createElement("td");
+    let tdEmployees = document.createElement("td");
+       
+    let ulObj = document.createElement("ul");
+
+    
+    shft.EmployeeID.forEach(emid =>
+    {
+      EmployeeID = emid;
+    })
+
+    shft.Employees.forEach(empl =>
+      {
+        let liObj = document.createElement("li");
+        let aObj = document.createElement("a");     
+        aObj.innerText = empl;        
+        liObj.value = shft.EmployeeID; 
+        aObj.href = "employeeEdit%20_a.html";
+
+        liObj.appendChild(aObj);             
+        ulObj.appendChild(liObj);
+      })
+
+    tdEmployees.appendChild(ulObj);
+    tdDate.innerText = shft.Date;
+    tdStarts.innerText = shft.Starts+"pm";
+    tdEnds.innerText = shft.Ends+"pm";
+
+    tdEmployees.appendChild(ulObj);
+
+    let trObj = document.createElement("tr");
+
+    trObj.appendChild(tdDate);
+    trObj.appendChild(tdStarts);
+    trObj.appendChild(tdEnds);
+    trObj.appendChild(tdEmployees);
+
+    tblObj.appendChild(trObj);
+
+  });
+}
+
+async function geShiftsInfo()
+{
+  document.getElementById("userIdentity").innerText = localStorage.getItem("user name header");
+
+  let respShif = await fetch("https://localhost:44383/api/Shift");
+  let shifts = await respShif.json();
+
+ createShiftsTable(shifts)
+}
+
+    </script>
+
+<br>
+<h1 style="background-color: azure;">CompFactory Management System</h1> <br>
+<h2 style="color:antiquewhite">CompFactory Shifts</h2>
+<div>
+  
+    <h4 style="color: aqua;">Current User:</h4>
+    <h4 style="color: aqua;" id="userIdentity"></h4> 
+  </div> <br>
+  <h5 style="color: antiquewhite;">Push the button to add new shifts:
+  <button class="btn btn-primary" onclick="addShifts()">Add Shifts</button> </h5><br/>
+
+    <body onload="geShiftsInfo()">
+     
+        <div>
+          
+            <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Shift Date</th>
+                    <th scope="col">Shift Start Hour</th>
+                    <th scope="col">Shift End Hour</th>
+                    <th scope="col">Shift's Employees</th>
+                  </tr>
+                </thead>
+                <tbody id="tBody">
+          
+                </tbody>
+              </table>
+        </div>
+        <br>
+        <a style="color: azure;" href="homePage.html">Return to Home Page</a>
+    </body>
+</html>
